@@ -1,0 +1,1108 @@
+{
+  "tools": [
+    {
+      "name": "list_resumes",
+      "title": "List resumes",
+      "description": "Lists the user\u0027s WorkHunt resumes, newest first. The baseline resume is the one tailoring starts from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "description": "Page number, starting at 1.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "resumes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "isBaseline": {
+                  "type": "boolean"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "editUrl": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "status",
+                "isBaseline",
+                "updatedAt",
+                "editUrl"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "totalCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "resumes",
+          "page",
+          "totalCount"
+        ]
+      },
+      "annotations": {
+        "title": "List resumes",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_resume",
+      "title": "Get a resume",
+      "description": "Gets one resume\u0027s full content. A tailored resume that is still being written has status \u0027generating\u0027; its preview updates by itself when it is ready, so only call this again if the user asks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resumeId": {
+            "description": "The resume id, from list_resumes or tailor_resume.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "resumeId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "isBaseline": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": true,
+          "generationError": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "editUrl": {
+            "type": "string"
+          },
+          "template": {
+            "type": "integer"
+          },
+          "formattingOptions": {
+            "type": "object",
+            "properties": {
+              "fontFamily": {
+                "type": "string"
+              },
+              "fontSizePt": {
+                "type": "number"
+              },
+              "lineHeight": {
+                "type": "number"
+              },
+              "marginInches": {
+                "type": "number"
+              },
+              "accentColor": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "fontFamily",
+              "fontSizePt",
+              "lineHeight",
+              "marginInches",
+              "accentColor"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "isBaseline",
+          "updatedAt",
+          "content",
+          "generationError",
+          "editUrl",
+          "template",
+          "formattingOptions"
+        ]
+      },
+      "annotations": {
+        "title": "Get a resume",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/resume-v2.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/resume-v2.html",
+        "openai/widgetAccessible": true
+      }
+    },
+    {
+      "name": "tailor_resume",
+      "title": "Tailor resume to a job",
+      "description": "Creates a new resume tailored to a job posting, starting from the user\u0027s baseline resume. Pass the full job description text. Uses one of the user\u0027s daily AI analyses. Returns the tailored resume, or status \u0027generating\u0027 if it is still being written: the preview then fills in by itself when it is ready, so tell the user it is on its way rather than calling get_resume. The returned sessionId is used by generate_cover_letter and generate_interview_prep.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobDescription": {
+            "description": "The full text of the job posting.",
+            "type": "string"
+          },
+          "jobTitle": {
+            "description": "Optional short name for this job, e.g. \u0027Senior Engineer at Acme\u0027.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "jobDescription"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resume": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "isBaseline": {
+                "type": "boolean"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "content": true,
+              "generationError": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "editUrl": {
+                "type": "string"
+              },
+              "template": {
+                "type": "integer"
+              },
+              "formattingOptions": {
+                "type": "object",
+                "properties": {
+                  "fontFamily": {
+                    "type": "string"
+                  },
+                  "fontSizePt": {
+                    "type": "number"
+                  },
+                  "lineHeight": {
+                    "type": "number"
+                  },
+                  "marginInches": {
+                    "type": "number"
+                  },
+                  "accentColor": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fontFamily",
+                  "fontSizePt",
+                  "lineHeight",
+                  "marginInches",
+                  "accentColor"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "status",
+              "isBaseline",
+              "updatedAt",
+              "content",
+              "generationError",
+              "editUrl",
+              "template",
+              "formattingOptions"
+            ]
+          },
+          "tailorUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "resume",
+          "tailorUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Tailor resume to a job",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/resume-v2.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/resume-v2.html",
+        "openai/toolInvocation/invoking": "Tailoring your resume\u2026",
+        "openai/toolInvocation/invoked": "Resume tailored"
+      }
+    },
+    {
+      "name": "generate_cover_letter",
+      "title": "Write a cover letter",
+      "description": "Writes a cover letter for a job already tailored with tailor_resume (pass its sessionId). Returns the letter, or status \u0027generating\u0027 - then call get_cover_letter. If the session already has a cover letter it is returned unchanged, never rewritten (the user can regenerate it in WorkHunt).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "description": "The sessionId returned by tailor_resume.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "sessionId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "generationError": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "openUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "status",
+          "body",
+          "generationError",
+          "openUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Write a cover letter",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      }
+    },
+    {
+      "name": "get_cover_letter",
+      "title": "Get a cover letter",
+      "description": "Gets the cover letter for a tailoring session, if one has been written.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "description": "The sessionId returned by tailor_resume.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "sessionId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "generationError": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "openUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "status",
+          "body",
+          "generationError",
+          "openUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Get a cover letter",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "generate_interview_prep",
+      "title": "Generate interview prep",
+      "description": "Generates interview preparation for a job tailored with tailor_resume (needs a WorkHunt pass): likely interview questions, a company brief and recruiter-screen scripts by default. Only missing sections are generated; sections that already exist are returned unchanged, never replaced (the user can regenerate them in WorkHunt). If pending is non-empty, call again with sections set to pending to generate the rest.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "description": "The sessionId returned by tailor_resume.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "sections": {
+            "description": "Optional subset to generate: questions, company_brief, recruiter_scripts, day_of, technical_challenges, resume_coaching.",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "default": null
+          }
+        },
+        "required": [
+          "sessionId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questions": true,
+          "companyBrief": true,
+          "recruiterScripts": true,
+          "dayOfChecklist": true,
+          "technicalChallenges": true,
+          "resumeCoaching": true,
+          "openUrl": {
+            "type": "string"
+          },
+          "pending": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "questions",
+          "companyBrief",
+          "recruiterScripts",
+          "dayOfChecklist",
+          "technicalChallenges",
+          "resumeCoaching",
+          "openUrl",
+          "pending"
+        ]
+      },
+      "annotations": {
+        "title": "Generate interview prep",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "_meta": {
+        "openai/toolInvocation/invoking": "Preparing interview material\u2026"
+      }
+    },
+    {
+      "name": "get_interview_prep",
+      "title": "Get interview prep",
+      "description": "Gets the interview preparation already generated for a tailoring session (needs a WorkHunt pass).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "description": "The sessionId returned by tailor_resume.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "sessionId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questions": true,
+          "companyBrief": true,
+          "recruiterScripts": true,
+          "dayOfChecklist": true,
+          "technicalChallenges": true,
+          "resumeCoaching": true,
+          "openUrl": {
+            "type": "string"
+          },
+          "pending": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "questions",
+          "companyBrief",
+          "recruiterScripts",
+          "dayOfChecklist",
+          "technicalChallenges",
+          "resumeCoaching",
+          "openUrl",
+          "pending"
+        ]
+      },
+      "annotations": {
+        "title": "Get interview prep",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_applications",
+      "title": "List job applications",
+      "description": "Lists the job applications the user is tracking in WorkHunt, newest first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Optional status filter: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "page": {
+            "description": "Page number, starting at 1.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "company": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "appliedDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "nextDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "sessionId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid"
+                },
+                "resumeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid"
+                },
+                "trackerUrl": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "company",
+                "role",
+                "status",
+                "appliedDate",
+                "nextDate",
+                "notes",
+                "updatedAt",
+                "sessionId",
+                "resumeId",
+                "trackerUrl"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "trackerUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applications",
+          "page",
+          "totalCount",
+          "trackerUrl"
+        ]
+      },
+      "annotations": {
+        "title": "List job applications",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/applications-v2.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/applications-v2.html"
+      }
+    },
+    {
+      "name": "get_application",
+      "title": "Get a job application",
+      "description": "Gets one tracked job application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "description": "The application id, from list_applications.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "applicationId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "company": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "appliedDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "nextDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "resumeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "trackerUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company",
+          "role",
+          "status",
+          "appliedDate",
+          "nextDate",
+          "notes",
+          "updatedAt",
+          "sessionId",
+          "resumeId",
+          "trackerUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Get a job application",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "add_application",
+      "title": "Track a job application",
+      "description": "Adds a job application to the user\u0027s WorkHunt tracker. Pass sessionId/resumeId from tailor_resume to link the tailored resume.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "company": {
+            "description": "Company name.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Job title.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Defaults to applied.",
+            "type": "string",
+            "default": "applied"
+          },
+          "appliedDate": {
+            "description": "Date applied, ISO 8601 (YYYY-MM-DD). Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "default": null
+          },
+          "nextDate": {
+            "description": "Next step date, e.g. an interview, ISO 8601. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "default": null
+          },
+          "notes": {
+            "description": "Free-form notes. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "sessionId": {
+            "description": "sessionId from tailor_resume. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "resumeId": {
+            "description": "resumeId of the resume sent. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          }
+        },
+        "required": [
+          "company",
+          "role"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "company": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "appliedDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "nextDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "resumeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "trackerUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company",
+          "role",
+          "status",
+          "appliedDate",
+          "nextDate",
+          "notes",
+          "updatedAt",
+          "sessionId",
+          "resumeId",
+          "trackerUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Track a job application",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      }
+    },
+    {
+      "name": "update_application_status",
+      "title": "Update application status",
+      "description": "Moves a tracked application to a new status, e.g. from applied to interview, and can set its next step date at the same time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "description": "The application id, from list_applications.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "description": "New status: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Pass the current status to change only the date.",
+            "type": "string"
+          },
+          "nextDate": {
+            "description": "Next step date, e.g. an interview, ISO 8601. Optional; omitted keeps the current one.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "default": null
+          }
+        },
+        "required": [
+          "applicationId",
+          "status"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "company": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "appliedDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "nextDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "resumeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "trackerUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company",
+          "role",
+          "status",
+          "appliedDate",
+          "nextDate",
+          "notes",
+          "updatedAt",
+          "sessionId",
+          "resumeId",
+          "trackerUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Update application status",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      }
+    },
+    {
+      "name": "add_application_note",
+      "title": "Add a note to an application",
+      "description": "Adds a note to a tracked application\u0027s timeline, e.g. who the user spoke to or what was agreed. Existing notes are kept.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "description": "The application id, from list_applications.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "description": "The note text.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicationId",
+          "note"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "noteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "trackerUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicationId",
+          "noteId",
+          "note",
+          "createdAt",
+          "trackerUrl"
+        ]
+      },
+      "annotations": {
+        "title": "Add a note to an application",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      }
+    }
+  ]
+}

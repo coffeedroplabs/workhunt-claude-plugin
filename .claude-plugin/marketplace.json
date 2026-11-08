@@ -1,0 +1,15 @@
+{
+  "name": "workhunt",
+  "description": "The official WorkHunt plugin for Claude: resume tailoring and job application tracking.",
+  "owner": {
+    "name": "WorkHunt",
+    "email": "support@workhunt.ai"
+  },
+  "plugins": [
+    {
+      "name": "workhunt",
+      "source": "./",
+      "description": "Tailor resumes to job postings and track your job applications with WorkHunt."
+    }
+  ]
+}
