@@ -49,7 +49,7 @@ Claude also picks the right skill on its own when you describe what you want; th
 
 ## A first run
 
-1. You paste a posting and ask for a tailored resume. Claude tailors it in WorkHunt and gives you a link to review every change, with a short note on what it emphasised for the role.
+1. You paste a posting and ask for a tailored resume. Claude tailors it in WorkHunt and gives you a link to review every change. The resume takes a few seconds to write; ask Claude afterwards and it will tell you what it emphasised for the role.
 2. You ask for a cover letter. Claude generates it, shows the body and links to it in WorkHunt.
 3. You say you applied today. Claude checks the tracker, adds the application as applied and links the tailored resume to it.
 4. A week later you ask how the job hunt is going. Claude runs the pipeline review and suggests the follow-ups worth doing this week.
