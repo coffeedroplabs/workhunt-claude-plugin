@@ -788,7 +788,7 @@
     {
       "name": "add_application",
       "title": "Track a job application",
-      "description": "Adds a job application to the user\u0027s WorkHunt tracker. Pass sessionId/resumeId from tailor_resume to link the tailored resume.",
+      "description": "Adds a job application to the user\u0027s WorkHunt tracker. Pass sessionId/resumeId from tailor_resume to link the tailored resume. A session already tracked returns its existing application unchanged.",
       "inputSchema": {
         "type": "object",
         "properties": {
