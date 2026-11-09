@@ -1,5 +1,7 @@
 # WorkHunt for Claude
 
+<a href="https://www.claudeai.directory/launches/workhunt" target="_blank" rel="noopener"><img src="https://www.claudeai.directory/badge/workhunt" alt="WorkHunt - Listed on Claude AI Directory" width="220" height="54" /></a>
+
 Tailor your resume to any job posting, write a matching cover letter and interview prep, and track every application, right inside Claude. The plugin bundles the WorkHunt connector, a remote MCP server at https://api.workhunt.ai/mcp, with four guided skills for the parts of a job search you repeat: tailoring to a posting, reviewing your pipeline, preparing for interviews and logging what happened.
 
 ## What you need
