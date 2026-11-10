@@ -1,7 +1,5 @@
 # WorkHunt for Claude
 
-<a href="https://www.claudeai.directory/launches/workhunt" target="_blank" rel="noopener"><img src="https://www.claudeai.directory/badge/workhunt" alt="WorkHunt - Listed on Claude AI Directory" width="220" height="54" /></a>
-
 Tailor your resume to any job posting, write a matching cover letter and interview prep, and track every application, right inside Claude. The plugin bundles the WorkHunt connector, a remote MCP server at https://api.workhunt.ai/mcp, with four guided skills for the parts of a job search you repeat: tailoring to a posting, reviewing your pipeline, preparing for interviews and logging what happened.
 
 ## What you need
@@ -30,7 +28,7 @@ Then run `/mcp`, select workhunt and sign in. You sign in and approve on WorkHun
 
 ### claude.ai and Claude Cowork
 
-Download this repo as a zip (Code > Download ZIP on GitHub), then in Claude open Customize > Plugins and upload it. Open the WorkHunt connector and sign in when asked.
+Download `workhunt-plugin.zip` from the [latest release](https://github.com/coffeedroplabs/workhunt-claude-plugin/releases/latest), then in Claude open Customize > Plugins and upload it. Open the WorkHunt connector and sign in when asked.
 
 The plugin will also be in the Claude plugin directory once it is listed there.
 
@@ -76,6 +74,14 @@ Nothing can be deleted through Claude; deleting and editing resume content happe
 - Prep asks for a WorkHunt pass: interview prep is part of the pass, and the message links to where you can get one.
 - Commands not showing: restart Claude Code after installing, then run `/plugin` to confirm the plugin is enabled.
 
+## What the plugin sends and where
+
+The plugin is four instruction files (skills) and one connector entry. It runs no code on your machine: there are no hooks, no commands and no telemetry, and it stores no credentials. The `scripts/`, `evals/` and `.github/` folders in this repository are development tooling that Claude never runs.
+
+- To WorkHunt (`https://api.workhunt.ai/mcp`), only when Claude calls a tool: the job posting text you ask it to tailor to, and the application details you ask it to log (company, role, status, dates, notes). WorkHunt returns your resumes, cover letters, interview prep and applications to Claude so it can answer you.
+- Sign-in is OAuth on WorkHunt's own page. Claude holds an access token for your account; the plugin never sees your password.
+- If you give the tailor skill a job posting URL, Claude fetches that page with its own web fetch tool to read the posting. The plugin contacts no other host.
+
 ## Privacy and support
 
 - Privacy policy: https://workhunt.ai/privacy/ (see the section "ChatGPT & Claude"). We never sell your data and your resume is never used to train AI models. Data is stored in Sydney, Australia.
@@ -86,11 +92,23 @@ Nothing can be deleted through Claude; deleting and editing resume content happe
 ## Development
 
 - Validate the plugin: `claude plugin validate . --strict`
+- Run the repository checks CI runs: `./scripts/check-plugin.sh`
 - Run the evals: `claude plugin eval .`. They use mocked tools, so no real account or AI allowance is spent.
 - Iterate on one case: `claude plugin eval . --case <name> --runs 1 --ablation none`
 - Cases live in `evals/<case>/`, tool mocks in `evals/mocks/workhunt/`, and `evals/mocks/workhunt/_tools.json` holds the server's real tools/list response.
 - Try a local checkout: `claude plugin marketplace add ./` then `claude plugin install workhunt@workhunt`.
 
+### Releasing
+
+1. If the server's tools changed, replace `evals/mocks/workhunt/_tools.json` with the live `tools/list` response and update any mock or skill that names a changed field.
+2. Bump `version` in `.claude-plugin/plugin.json` (without a bump, `claude plugin update` reports nothing new) and add a dated entry to `CHANGELOG.md` (`## [x.y.z] - YYYY-MM-DD`).
+3. Run `./scripts/check-plugin.sh`, `claude plugin validate . --strict` and `claude plugin eval .`; every case must pass.
+4. Merge to `main`, then `claude plugin tag --push`. The `workhunt--v<version>` tag runs the evals in CI and publishes a GitHub release with `workhunt-plugin.zip`.
+
 ## License
 
 MIT, see LICENSE.
+
+## Also listed on
+
+- [Claude AI Directory](https://www.claudeai.directory/launches/workhunt), a community directory not run by Anthropic.

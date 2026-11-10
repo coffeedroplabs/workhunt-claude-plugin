@@ -1,0 +1,78 @@
+name: Release
+
+# Runs on the tag `claude plugin tag --push` creates: workhunt--v<version>.
+on:
+  push:
+    tags: ["workhunt--v*"]
+
+permissions:
+  contents: read
+
+env:
+  CLAUDE_CODE_VERSION: "2.1.322"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Claude Code
+        run: npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+      - name: Check the tag matches plugin.json and the changelog is dated
+        id: version
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open(".claude-plugin/plugin.json"))["version"])')
+          if [ "$GITHUB_REF_NAME" != "workhunt--v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match plugin.json version $version."
+            exit 1
+          fi
+          if ! grep -Eq "^## \[$version\] - [0-9]{4}-[0-9]{2}-[0-9]{2}$" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md needs a dated entry: ## [$version] - YYYY-MM-DD"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Repository checks
+        run: ./scripts/check-plugin.sh
+      - name: Validate plugin and marketplace
+        run: claude plugin validate . --strict
+
+  evals:
+    needs: verify
+    uses: ./.github/workflows/evals.yml
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  publish:
+    needs: [verify, evals]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the plugin zip
+        run: ./scripts/build-zip.sh workhunt-plugin.zip
+      - name: Extract release notes
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" workhunt-plugin.zip \
+            --title "WorkHunt for Claude $VERSION" \
+            --notes-file release-notes.md --verify-tag
