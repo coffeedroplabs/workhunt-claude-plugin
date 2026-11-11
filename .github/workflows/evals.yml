@@ -9,9 +9,14 @@ on:
         description: Runs per case
         default: "3"
   workflow_call:
+    inputs:
+      skip_without_key:
+        description: Pass with a warning, instead of failing, when the API key secret is not set
+        type: boolean
+        default: false
     secrets:
       ANTHROPIC_API_KEY:
-        required: true
+        required: false
 
 permissions:
   contents: read
@@ -36,8 +41,13 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           RUNS: ${{ inputs.runs || '3' }}
+          SKIP_WITHOUT_KEY: ${{ inputs.skip_without_key || 'false' }}
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
+            if [ "$SKIP_WITHOUT_KEY" = "true" ]; then
+              echo "::warning::ANTHROPIC_API_KEY is not set, so the evals were skipped. Run them locally before releasing."
+              exit 0
+            fi
             echo "::error::The ANTHROPIC_API_KEY repository secret is not set."
             exit 1
           fi

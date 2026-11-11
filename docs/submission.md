@@ -1,16 +1,18 @@
 # Claude plugin directory submission
 
-Working notes for submitting at https://claude.ai/directory/manage (Submit new > Plugin bundle). Items marked **confirm** need checking against the live service or the privacy policy before they are pasted into the form.
+Working notes for submitting at https://claude.ai/directory/manage (Submit new > Plugin bundle). Checked boxes were verified on 2026-11-11; the rest need your accounts.
 
 ## Before submitting
 
-- [ ] The repository is public and `main` has the `Validate` workflow passing.
+- [x] The repository is public.
+- [ ] `main` has the `Validate` workflow passing.
 - [ ] `workhunt--v<version>` is tagged and the GitHub release has `workhunt-plugin.zip`.
 - [ ] The WorkHunt connector (the MCP server at `https://api.workhunt.ai/mcp`) is submitted or listed as a connector.
 - [ ] Tool descriptions on the server contain no instructions aimed at Claude. In the copy in `evals/mocks/workhunt/_tools.json`, `tailor_resume` ("tell the user it is on its way rather than calling get_resume") and `get_resume` ("only call this again if the user asks") do. The skills already carry that guidance.
-- [ ] `evals/mocks/workhunt/_tools.json` matches the live `tools/list` response.
+- [x] `evals/mocks/workhunt/_tools.json` matches the live connector's tools (names, descriptions and input fields).
 - [ ] A reviewer test account exists (see below).
-- [ ] Privacy, terms, contact and setup URLs in `.claude-plugin/plugin.json` load without signing in.
+- [x] Privacy, terms, contact and setup URLs in `.claude-plugin/plugin.json` load without signing in.
+- [x] The MCP endpoint answers unauthenticated requests with 401 and OAuth metadata (PKCE S256, dynamic client registration, refresh tokens).
 - [ ] The release zip uploads cleanly in claude.ai and Claude Cowork. If the upload rejects the `argument-hint` key in `skills/{tailor,prep,track}/SKILL.md`, remove it; `$ARGUMENTS` works without it.
 
 ## Source
@@ -42,8 +44,13 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
 - Authentication: OAuth on WorkHunt's sign-in page. The plugin holds no credentials and has no `userConfig`.
 - Local execution: none. No hooks, commands, agents or bundled binaries.
 - Other network access: none by the plugin. The tailor skill may ask Claude to fetch a job posting URL the user supplied, with Claude's own web fetch tool.
-- Storage and retention: data is stored in Sydney, Australia. **confirm** retention and deletion wording against the privacy policy.
-- Model training: resumes are never used to train AI models, and data is never sold. **confirm** against the privacy policy.
+- Storage: Sydney, Australia (database, file storage and API hosting). WorkHunt stores what Claude's requests create (tailored resumes, cover letters, interview prep, applications) in the user's account.
+- AI processing on WorkHunt's side: tailoring, cover letters and interview prep are written by WorkHunt's model provider (through OpenRouter, currently Google), with data collection disabled.
+- Retention: data is kept while the account is open. Deleting the account from Settings takes effect immediately; only billing records and audit entries required by law are kept.
+- Connection: access tokens last an hour and renew for up to 30 days of inactivity, at most 90 days after approval. Users disconnect from Claude's connector settings.
+- Model training and sale: resume and job-search content is not used to train AI models, and personal information is not sold.
+
+These statements were checked against https://workhunt.ai/privacy/ (last updated 8 November 2026) on 2026-11-11.
 
 ## Compliance
 

@@ -45,6 +45,8 @@ jobs:
   evals:
     needs: verify
     uses: ./.github/workflows/evals.yml
+    with:
+      skip_without_key: true
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 

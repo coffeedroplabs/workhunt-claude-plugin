@@ -78,7 +78,7 @@ Nothing can be deleted through Claude; deleting and editing resume content happe
 
 The plugin is four instruction files (skills) and one connector entry. It runs no code on your machine: there are no hooks, no commands and no telemetry, and it stores no credentials. The `scripts/`, `evals/` and `.github/` folders in this repository are development tooling that Claude never runs.
 
-- To WorkHunt (`https://api.workhunt.ai/mcp`), only when Claude calls a tool: the job posting text you ask it to tailor to, and the application details you ask it to log (company, role, status, dates, notes). WorkHunt returns your resumes, cover letters, interview prep and applications to Claude so it can answer you.
+- To WorkHunt (`https://api.workhunt.ai/mcp`), only when Claude calls a tool: the job posting text you ask it to tailor to, and the application details you ask it to log (company, role, status, dates, notes). WorkHunt returns your resumes, cover letters, interview prep and applications to Claude so it can answer you. WorkHunt stores what those requests create in your account and writes tailored content with its AI provider, as its privacy policy describes; that provider neither keeps your content nor trains on it.
 - Sign-in is OAuth on WorkHunt's own page. Claude holds an access token for your account; the plugin never sees your password.
 - If you give the tailor skill a job posting URL, Claude fetches that page with its own web fetch tool to read the posting. The plugin contacts no other host.
 
