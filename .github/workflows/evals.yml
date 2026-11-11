@@ -51,7 +51,7 @@ jobs:
             echo "::error::The ANTHROPIC_API_KEY repository secret is not set."
             exit 1
           fi
-          claude plugin eval . \
+          claude plugin eval plugins/workhunt \
             --trust-plugin --no-publish \
             --model "$EVAL_MODEL" --judge-model "$EVAL_JUDGE_MODEL" \
             --runs "$RUNS" --concurrency 4 --threshold 1.0 --max-cost-usd 20 \

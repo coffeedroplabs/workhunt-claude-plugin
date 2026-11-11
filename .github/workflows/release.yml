@@ -27,7 +27,7 @@ jobs:
       - name: Check the tag matches plugin.json and the changelog is dated
         id: version
         run: |
-          version=$(python3 -c 'import json; print(json.load(open(".claude-plugin/plugin.json"))["version"])')
+          version=$(python3 -c 'import json; print(json.load(open("plugins/workhunt/.claude-plugin/plugin.json"))["version"])')
           if [ "$GITHUB_REF_NAME" != "workhunt--v$version" ]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match plugin.json version $version."
             exit 1
@@ -39,8 +39,10 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Repository checks
         run: ./scripts/check-plugin.sh
-      - name: Validate plugin and marketplace
+      - name: Validate the marketplace
         run: claude plugin validate . --strict
+      - name: Validate the plugin against the directory's checks
+        run: claude plugin validate plugins/workhunt --strict --profile directory
 
   evals:
     needs: verify

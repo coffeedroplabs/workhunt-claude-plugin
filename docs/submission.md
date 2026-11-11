@@ -5,19 +5,20 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
 ## Before submitting
 
 - [x] The repository is public.
-- [ ] `main` has the `Validate` workflow passing.
-- [ ] `workhunt--v<version>` is tagged and the GitHub release has `workhunt-plugin.zip`.
+- [x] `main` has the `Validate` workflow passing.
+- [x] `workhunt--v<version>` is tagged and the GitHub release has `workhunt-plugin.zip`.
 - [ ] The WorkHunt connector (the MCP server at `https://api.workhunt.ai/mcp`) is submitted or listed as a connector.
-- [ ] Tool descriptions on the server contain no instructions aimed at Claude. `tailor_resume` and `get_resume` used to; the fix is on `resumae-api` branch `claude/eloquent-allen-jjh2uj` and takes effect once that is merged and deployed. The skills carry the guidance instead.
-- [ ] `evals/mocks/workhunt/_tools.json` matches the live connector's tools (names, descriptions and input fields). It already holds the corrected `tailor_resume` and `get_resume` descriptions, so it matches again once the `resumae-api` fix is deployed.
+- [ ] Tool descriptions on the server contain no instructions aimed at Claude. `tailor_resume` and `get_resume` used to; the fix is on `resumae-api` `main` and was deployed to production (Fly v488) on 2026-11-11. Tick this once a signed-in `tools/list` shows the new wording. The skills carry the guidance instead.
+- [ ] `plugins/workhunt/evals/mocks/workhunt/_tools.json` matches the live connector's tools (names, descriptions and input fields). It holds the corrected `tailor_resume` and `get_resume` descriptions, so tick it together with the item above.
 - [ ] A reviewer test account exists (see below).
-- [x] Privacy, terms, contact and setup URLs in `.claude-plugin/plugin.json` load without signing in.
+- [x] Privacy, terms, contact and setup URLs in `plugins/workhunt/.claude-plugin/plugin.json` load without signing in.
 - [x] The MCP endpoint answers unauthenticated requests with 401 and OAuth metadata (PKCE S256, dynamic client registration, refresh tokens).
-- [ ] The release zip uploads cleanly in claude.ai and Claude Cowork. If the upload rejects the `argument-hint` key in `skills/{tailor,prep,track}/SKILL.md`, remove it; `$ARGUMENTS` works without it.
+- [ ] The release zip uploads cleanly in claude.ai and Claude Cowork. If the upload rejects the `argument-hint` key in `plugins/workhunt/skills/{tailor,prep,track}/SKILL.md`, remove it; `$ARGUMENTS` works without it.
 
 ## Source
 
 - Repository: `coffeedroplabs/workhunt-claude-plugin`
+- Plugin path: `plugins/workhunt`. The directory then scans only that folder; submitted from the repository root it also scans `scripts/` and `.github/`, and holds the plugin for a reviewer.
 - Track: `main`, publishing each version manually until a few releases have gone through.
 
 ## Listing details
@@ -31,7 +32,7 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
   - "How's my job hunt going?"
   - "Prep me for my Northwind interview"
   - "Applied to Contoso for Software Engineer today, phone screen next Tuesday"
-- Icon: `assets/icon.png` (512 x 512)
+- Icon: `plugins/workhunt/assets/icon.png` (512 x 512)
 - Documentation: https://app.workhunt.ai/connect
 - Support: https://workhunt.ai/contact/ and support@workhunt.ai
 - Privacy policy: https://workhunt.ai/privacy/

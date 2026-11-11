@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "workhunt",
-      "source": "./",
+      "source": "./plugins/workhunt",
       "description": "Tailor resumes to job postings and track your job applications with WorkHunt.",
       "category": "productivity",
       "tags": [

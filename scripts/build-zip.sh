@@ -3,9 +3,14 @@
 # without the eval suite, CI or scripts. Run from the repository root.
 set -euo pipefail
 
-out=${1:-workhunt-plugin.zip}
+out=$(realpath -m "${1:-workhunt-plugin.zip}")
 rm -f "$out"
-git ls-files -z -- .claude-plugin .mcp.json skills assets LICENSE README.md \
-  | xargs -0 zip -q -X "$out"
+# Zipped from inside the plugin folder so .claude-plugin/plugin.json sits at the
+# zip's root, where the upload looks for it.
+(
+  cd plugins/workhunt
+  git ls-files -z -- .claude-plugin .mcp.json skills assets LICENSE README.md \
+    | xargs -0 zip -q -X "$out"
+)
 echo "Built $out:"
 unzip -l "$out"

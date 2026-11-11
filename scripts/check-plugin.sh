@@ -4,6 +4,7 @@
 set -euo pipefail
 
 fail=0
+plugin=plugins/workhunt
 err() { echo "ERROR: $*" >&2; fail=1; }
 
 # Every JSON file parses.
@@ -12,7 +13,7 @@ while IFS= read -r f; do
 done < <(git ls-files '*.json')
 
 # Every tool mock body is valid JSON once its frontmatter is removed.
-for f in evals/mocks/*/*.md evals/*/mocks/*/*.md; do
+for f in "$plugin"/evals/mocks/*/*.md "$plugin"/evals/*/mocks/*/*.md; do
   [ -e "$f" ] || continue
   python3 - "$f" <<'PY' || err "$f: mock body is not valid JSON"
 import json, re, sys
@@ -27,10 +28,11 @@ PY
 done
 
 # Every tool the live server lists has a mock, and every mock names a real tool.
-python3 - <<'PY' || fail=1
+python3 - "$plugin" <<'PY' || fail=1
 import json, pathlib, sys
-tools = {t["name"] for t in json.load(open("evals/mocks/workhunt/_tools.json"))["tools"]}
-mocks = {p.stem for p in pathlib.Path("evals/mocks/workhunt").glob("*.md")}
+mock_dir = pathlib.Path(sys.argv[1], "evals/mocks/workhunt")
+tools = {t["name"] for t in json.load(open(mock_dir / "_tools.json"))["tools"]}
+mocks = {p.stem for p in mock_dir.glob("*.md")}
 bad = False
 for name in sorted(tools - mocks):
     print(f"ERROR: tool {name} has no mock", file=sys.stderr); bad = True
@@ -40,10 +42,10 @@ sys.exit(1 if bad else 0)
 PY
 
 # Every tool has a title and a read-only or destructive hint (connector review).
-python3 - <<'PY' || fail=1
+python3 - "$plugin" <<'PY' || fail=1
 import json, sys
 bad = False
-for t in json.load(open("evals/mocks/workhunt/_tools.json"))["tools"]:
+for t in json.load(open(sys.argv[1] + "/evals/mocks/workhunt/_tools.json"))["tools"]:
     a = t.get("annotations") or {}
     if not (t.get("title") or a.get("title")):
         print(f"ERROR: tool {t['name']} has no title", file=sys.stderr); bad = True
@@ -55,17 +57,17 @@ sys.exit(1 if bad else 0)
 PY
 
 # The remote MCP server is https.
-python3 - <<'PY' || fail=1
+python3 - "$plugin" <<'PY' || fail=1
 import json, sys
 bad = False
-for name, s in json.load(open(".mcp.json"))["mcpServers"].items():
+for name, s in json.load(open(sys.argv[1] + "/.mcp.json"))["mcpServers"].items():
     if not s.get("url", "").startswith("https://"):
         print(f"ERROR: MCP server {name} is not https", file=sys.stderr); bad = True
 sys.exit(1 if bad else 0)
 PY
 
 # Each skill has a name matching its folder and a description within the limit.
-for f in skills/*/SKILL.md; do
+for f in "$plugin"/skills/*/SKILL.md; do
   python3 - "$f" <<'PY' || fail=1
 import pathlib, re, sys
 path = pathlib.Path(sys.argv[1])
@@ -94,11 +96,17 @@ while IFS= read -r f; do
 done < <(git ls-files)
 [ -f .gitmodules ] && err "submodules are not allowed"
 [ "$(git ls-files | wc -l)" -gt 512 ] && err "more than 512 files"
-[ -f LICENSE ] || err "LICENSE is missing"
-[ "$(wc -w < README.md)" -ge 40 ] || err "README.md is under 40 words"
+[ -f "$plugin/LICENSE" ] || err "$plugin/LICENSE is missing"
+[ "$(wc -w < "$plugin/README.md")" -ge 40 ] || err "$plugin/README.md is under 40 words"
+
+# The directory scans only the plugin folder, so the scripts that hold a submission
+# for manual review must stay outside it.
+while IFS= read -r f; do
+  err "$f is executable; keep scripts outside $plugin"
+done < <(git ls-files -s -- "$plugin" | awk '$1 == "100755" { print $4 }')
 
 # The changelog has an entry for the version being released.
-version=$(python3 -c 'import json; print(json.load(open(".claude-plugin/plugin.json"))["version"])')
+version=$(python3 -c 'import json; print(json.load(open("'"$plugin"'/.claude-plugin/plugin.json"))["version"])')
 grep -q "^## \[$version\]" CHANGELOG.md || err "CHANGELOG.md has no entry for $version"
 
 [ "$fail" -eq 0 ] && echo "All repository checks passed (version $version)."
