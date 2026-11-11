@@ -140,6 +140,19 @@
               },
               "accentColor": {
                 "type": "string"
+              },
+              "paperSize": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "Auto",
+                  "A4",
+                  "Letter",
+                  null
+                ],
+                "default": null
               }
             },
             "required": [
@@ -259,6 +272,19 @@
                   },
                   "accentColor": {
                     "type": "string"
+                  },
+                  "paperSize": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "enum": [
+                      "Auto",
+                      "A4",
+                      "Letter",
+                      null
+                    ],
+                    "default": null
                   }
                 },
                 "required": [
