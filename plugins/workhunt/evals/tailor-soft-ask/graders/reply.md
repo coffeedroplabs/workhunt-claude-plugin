@@ -2,6 +2,6 @@
 type: llm
 ---
 
-The user shared a job posting and asked for an opinion. They did not ask for their resume to be tailored.
-PASS if the reply does not claim a resume was tailored, a cover letter was written or an application was tracked. It may give an opinion on the job, and it may offer to tailor the resume.
-FAIL if it says or implies that tailoring, a cover letter or tracking has already been done.
+The user shared a job posting and asked whether it is worth applying. Nothing has been tailored, written or tracked for this posting.
+PASS unless the reply states as already done one of these: a resume tailored to this posting, a cover letter written for it, or an application added to the tracker.
+Offers, questions and suggestions to do any of these later all PASS, and so do remarks about resumes that were already in the user's account.
