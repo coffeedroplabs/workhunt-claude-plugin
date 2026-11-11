@@ -9,7 +9,15 @@
     {
       "name": "workhunt",
       "source": "./",
-      "description": "Tailor resumes to job postings and track your job applications with WorkHunt."
+      "description": "Tailor resumes to job postings and track your job applications with WorkHunt.",
+      "category": "productivity",
+      "tags": [
+        "resume",
+        "job-search",
+        "career",
+        "cover-letter",
+        "interview-prep"
+      ]
     }
   ]
 }
