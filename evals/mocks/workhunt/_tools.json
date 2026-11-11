@@ -76,7 +76,7 @@
     {
       "name": "get_resume",
       "title": "Get a resume",
-      "description": "Gets one resume\u0027s full content. A tailored resume that is still being written has status \u0027generating\u0027; its preview updates by itself when it is ready, so only call this again if the user asks.",
+      "description": "Gets one resume\u0027s full content. A tailored resume that is still being written has status \u0027generating\u0027; its preview updates by itself when it is ready, with no further call needed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -181,7 +181,7 @@
     {
       "name": "tailor_resume",
       "title": "Tailor resume to a job",
-      "description": "Creates a new resume tailored to a job posting, starting from the user\u0027s baseline resume. Pass the full job description text. Uses one of the user\u0027s daily AI analyses. Returns the tailored resume, or status \u0027generating\u0027 if it is still being written: the preview then fills in by itself when it is ready, so tell the user it is on its way rather than calling get_resume. The returned sessionId is used by generate_cover_letter and generate_interview_prep.",
+      "description": "Creates a new resume tailored to a job posting, starting from the user\u0027s baseline resume. Pass the full job description text. Uses one of the user\u0027s daily AI analyses. Returns the tailored resume, or status \u0027generating\u0027 if it is still being written: the preview then fills in by itself when it is ready, with no further call needed. The returned sessionId is used by generate_cover_letter and generate_interview_prep.",
       "inputSchema": {
         "type": "object",
         "properties": {

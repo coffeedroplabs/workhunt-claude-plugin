@@ -8,8 +8,8 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
 - [ ] `main` has the `Validate` workflow passing.
 - [ ] `workhunt--v<version>` is tagged and the GitHub release has `workhunt-plugin.zip`.
 - [ ] The WorkHunt connector (the MCP server at `https://api.workhunt.ai/mcp`) is submitted or listed as a connector.
-- [ ] Tool descriptions on the server contain no instructions aimed at Claude. In the copy in `evals/mocks/workhunt/_tools.json`, `tailor_resume` ("tell the user it is on its way rather than calling get_resume") and `get_resume` ("only call this again if the user asks") do. The skills already carry that guidance.
-- [x] `evals/mocks/workhunt/_tools.json` matches the live connector's tools (names, descriptions and input fields).
+- [ ] Tool descriptions on the server contain no instructions aimed at Claude. `tailor_resume` and `get_resume` used to; the fix is on `resumae-api` branch `claude/eloquent-allen-jjh2uj` and takes effect once that is merged and deployed. The skills carry the guidance instead.
+- [ ] `evals/mocks/workhunt/_tools.json` matches the live connector's tools (names, descriptions and input fields). It already holds the corrected `tailor_resume` and `get_resume` descriptions, so it matches again once the `resumae-api` fix is deployed.
 - [ ] A reviewer test account exists (see below).
 - [x] Privacy, terms, contact and setup URLs in `.claude-plugin/plugin.json` load without signing in.
 - [x] The MCP endpoint answers unauthenticated requests with 401 and OAuth metadata (PKCE S256, dynamic client registration, refresh tokens).
