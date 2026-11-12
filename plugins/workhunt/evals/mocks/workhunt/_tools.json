@@ -593,7 +593,7 @@
         "type": "object",
         "properties": {
           "status": {
-            "description": "Optional status filter: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted.",
+            "description": "Optional status filter: saved, tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted.",
             "type": [
               "string",
               "null"
@@ -827,7 +827,7 @@
             "type": "string"
           },
           "status": {
-            "description": "Status: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Defaults to applied.",
+            "description": "Status: saved, tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Defaults to applied.",
             "type": "string",
             "default": "applied"
           },
@@ -973,7 +973,7 @@
             "format": "uuid"
           },
           "status": {
-            "description": "New status: tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Pass the current status to change only the date.",
+            "description": "New status: saved, tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted. Pass the current status to change only the date.",
             "type": "string"
           },
           "nextDate": {

@@ -15,7 +15,7 @@ Give the user a compact, honest read of where their WorkHunt pipeline stands, wh
 
 2. If there are none, say so, give the `trackerUrl`, and offer to log the first one: ask what they applied to and for which role.
 
-3. Summarise counts by stage in pipeline order: tailored, applied, screening, interview, offer, then the closed stages (rejected, withdrawn, ghosted) kept to a single line.
+3. Summarise counts by stage in pipeline order: saved, tailored, applied, screening, interview, offer, then the closed stages (rejected, withdrawn, ghosted) kept to a single line. Saved means a job kept for later: nothing has been tailored or sent for it yet.
 
 4. Flag what needs attention, measured against today's date, as a short list giving company, role and the date:
 

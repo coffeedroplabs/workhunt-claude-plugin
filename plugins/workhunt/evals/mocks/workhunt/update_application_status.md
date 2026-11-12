@@ -1,7 +1,7 @@
 ---
 expect:
   applicationId: string
-  status: [tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted]
+  status: [saved, tailored, applied, screening, interview, offer, rejected, withdrawn, ghosted]
 ---
 
 {

@@ -1,6 +1,6 @@
 ---
 name: track
-description: "Logs job application updates in the WorkHunt tracker from a plain-language message: a new application, a status change, an interview or next-step date, or a note. Use when the user says they applied somewhere, heard back, got an interview, offer or rejection, or wants to record something about an application."
+description: "Logs job application updates in the WorkHunt tracker from a plain-language message: a new application, a job saved for later, a status change, an interview or next-step date, or a note. Use when the user says they applied somewhere, wants a job saved to apply to later, heard back, got an interview, offer or rejection, or wants to record something about an application."
 argument-hint: "[what happened, e.g. applied to Contoso SWE today]"
 ---
 
@@ -10,11 +10,11 @@ Turn a plain-language update into the right WorkHunt tracker write.
 
 ## Workflow
 
-1. Parse the message ($ARGUMENTS or the conversation) into: company, role, status, appliedDate, nextDate, and any extra detail worth a note (who they spoke to, salary discussed, next steps). Map phrases to statuses: "applied" -> applied, "recruiter call / phone screen" -> screening, "interview / onsite / panel" -> interview, "offer" -> offer, "rejected / turned down" -> rejected, "I withdrew / pulled out" -> withdrawn, "never heard back" -> ghosted. A scheduled screen or interview is a nextDate; only move the status forward if the user says it has happened or been booked (a booked phone screen means screening with nextDate on that day).
+1. Parse the message ($ARGUMENTS or the conversation) into: company, role, status, appliedDate, nextDate, and any extra detail worth a note (who they spoke to, salary discussed, next steps). Map phrases to statuses: "save it / bookmark it / I want to apply later" -> saved, "applied" -> applied, "recruiter call / phone screen" -> screening, "interview / onsite / panel" -> interview, "offer" -> offer, "rejected / turned down" -> rejected, "I withdrew / pulled out" -> withdrawn, "never heard back" -> ghosted. A scheduled screen or interview is a nextDate; only move the status forward if the user says it has happened or been booked (a booked phone screen means screening with nextDate on that day).
 2. Resolve relative dates ("today", "next Tuesday", "in two weeks") against today's date and convert them to YYYY-MM-DD. "Next <weekday>" means the first such weekday after today. State the dates you resolved in your reply so the user can correct them.
 3. Call list_applications to look for an existing application with the same company (case-insensitive) and a similar role. Page through if totalCount is larger than the first page.
 4. If exactly one matches: call update_application_status(applicationId, status, nextDate) - pass the current status if only the date changes, and skip the call if nothing changes. Then, if there is extra detail, call add_application_note(applicationId, note) with a short factual note.
-5. If none matches: call add_application with company, role, status (default applied), appliedDate (today if they say they applied today), nextDate and notes for any extra detail.
+5. If none matches: call add_application with company, role, status (default applied), appliedDate (today if they say they applied today; none for a saved job), nextDate and notes for any extra detail.
 6. If more than one matches, or the company or role is missing, ask a short question before writing anything. Otherwise do not ask for confirmation: the user's message is the instruction.
 7. Reply in one or two lines: what was recorded (company, role, status, dates) and trackerUrl.
 

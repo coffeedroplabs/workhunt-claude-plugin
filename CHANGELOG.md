@@ -2,6 +2,12 @@
 
 All notable changes to the WorkHunt plugin for Claude are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the plugin uses [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- The saved stage: `track` saves a job to apply to later, `pipeline` lists saved jobs first, and `tailor` moves a saved job to tailored.
+
 ## [1.0.0] - 2026-11-11
 
 ### Added

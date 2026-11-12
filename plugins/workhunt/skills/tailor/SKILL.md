@@ -48,7 +48,7 @@ cover letter and tracking for the application.
 8. **Track the application, if the user wants it.** Call list_applications first and look
    for an existing application with the same company and a similar role (compare
    case-insensitively). If one exists, offer to update it with update_application_status
-   instead of adding a duplicate. Otherwise call add_application with company, role,
+   instead of adding a duplicate (a saved one moves to "tailored"). Otherwise call add_application with company, role,
    status "tailored" (or "applied" if the user says they already applied, with
    appliedDate set to today), plus sessionId and resume.id from step 4 so the tailored
    resume is linked. Finish with trackerUrl.
