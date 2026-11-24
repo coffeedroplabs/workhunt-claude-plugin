@@ -16,14 +16,14 @@ Get the user ready for a specific interview using the prep WorkHunt already hold
 4. If a tool says prep needs a WorkHunt pass, relay that in plain words with any link it contains and stop.
 5. Summarise for the user:
    - the three to five most useful points from `companyBrief`;
-   - the top five likely questions, one line each on what a strong answer covers, using the question's own guidance where present.
+   - the top five likely questions, one line each on what a strong answer covers, using the question's own guidance where present. Where the client shows the prep as an inline card, the questions are already on screen: name the one or two to focus on instead of listing them.
    Mention that the other sections exist (recruiter scripts, day-of checklist, technical challenges, resume coaching) without dumping them, and show any of them in full if asked.
 6. Offer a short mock interview. If the user accepts, ask one question at a time from the generated questions, wait for their answer, then give brief feedback: what landed, what to tighten, and one concrete improvement, judged against that question's guidance and the company brief. Move on when the user is ready. Stop when they say so and end with a two-line summary of their strengths and the one thing to practise.
 7. End with the `openUrl` link so the user can review the prep in WorkHunt.
 
 ## Rules
 
-- Tools are named by their bare names (get_interview_prep, generate_interview_prep, list_applications, tailor_resume). Depending on the client they carry a prefix such as mcp__plugin_workhunt_workhunt__ or a connector prefix; any WorkHunt tool with the matching bare name is the right one. If no WorkHunt tools are available at all, tell the user to connect WorkHunt: run /mcp in Claude Code and sign in to "workhunt", or in claude.ai enable the WorkHunt connector under Settings > Connectors. Do not try to do the task another way.
+- Tools are named by their bare names (get_interview_prep, generate_interview_prep, list_applications, tailor_resume). Depending on the client they carry a prefix such as mcp__plugin_workhunt_workhunt__ or a connector prefix; any WorkHunt tool with the matching bare name is the right one. If no WorkHunt tools are available at all, tell the user to connect WorkHunt (in Claude Code, run /mcp and sign in to "workhunt") and give them the setup guide, https://workhunt.ai/claude/. Do not try to do the task another way.
 - Never delete anything. There are no delete tools; deleting and editing resume content happen in the WorkHunt app.
 - A WorkHunt tool error is written for the user (for example "Set a baseline resume first ...", a daily limit, or "needs a WorkHunt pass"). Relay it in plain words, include any link it contains, and do not retry the call.
 - End with the WorkHunt link the last relevant tool returned (`openUrl`, `tailorUrl`, `editUrl` or `trackerUrl`) so the user can review or continue in WorkHunt.

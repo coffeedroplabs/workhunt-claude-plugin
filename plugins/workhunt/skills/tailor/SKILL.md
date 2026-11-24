@@ -11,24 +11,27 @@ cover letter and tracking for the application.
 
 ## Workflow
 
-1. **Get the posting.** Use the text in $ARGUMENTS or in the conversation. If it is a
-   URL, fetch the page with the web fetch tool and extract the posting text (title,
-   company, responsibilities, requirements). If the fetch fails or the page has no
-   posting (login wall, expired listing), ask the user to paste the text. If there is no
-   posting at all, ask for one. Pass the full posting text to the tool, not a summary.
+1. **Get the posting.** Use what is in $ARGUMENTS or in the conversation. Pass posting
+   text in full, not a summary. If the user gave only a link, pass it as jobUrl and leave
+   jobDescription out: WorkHunt reads the page and keeps the link with the posting, so do
+   not fetch it yourself. If they gave both, pass the text as jobDescription and the link
+   as jobUrl. If there is no posting at all, ask for one.
 
 2. **Identify the company and role.** Form jobTitle as "<Role> at <Company>", at most
-   about 100 characters. If either part is unclear, leave jobTitle out instead of
-   guessing.
+   about 100 characters. If either part is unclear, or you only have a link, leave
+   jobTitle out instead of guessing.
 
 3. **Confirm the spend only when needed.** tailor_resume uses one of the user's daily AI
-   analyses. If the user clearly asked to tailor their resume to this posting, call it
-   straight away without asking. If they only shared a posting or asked something softer
+   tailoring sessions. If the user clearly asked to tailor their resume to this posting,
+   call it straight away without asking. If they only shared a posting or asked something softer
    ("thoughts on this job?"), ask once whether to tailor their resume to it and mention
-   that it uses one daily analysis.
+   that it uses one of their daily AI tailoring sessions.
 
-4. **Call tailor_resume once** with the full posting text and jobTitle. Never call it
-   twice for the same posting in a conversation; keep the sessionId and reuse it.
+4. **Call tailor_resume once** with the posting from step 1 and jobTitle. Never call it
+   twice for the same posting in a conversation; keep the sessionId and reuse it. The one
+   exception: when WorkHunt could not read the link, the error asks for the posting text
+   and nothing was spent. Ask the user to paste the text, then call tailor_resume again
+   with it as jobDescription and the same jobUrl.
 
 5. **Report the result.** If resume.status is "generating", say the resume is being
    written and will be ready in WorkHunt shortly, and that it fills in by itself where
@@ -58,16 +61,17 @@ cover letter and tracking for the application.
 - Tools are named by their bare names (tailor_resume, list_applications, ...). Depending
   on the client they carry a prefix such as mcp__plugin_workhunt_workhunt__ or a
   connector prefix; any WorkHunt tool with the matching bare name is the right one. If no
-  WorkHunt tools are available at all, tell the user to connect WorkHunt: run /mcp in
-  Claude Code and sign in to "workhunt", or in claude.ai enable the WorkHunt connector
-  under Settings > Connectors. Do not try to do the task another way.
+  WorkHunt tools are available at all, tell the user to connect WorkHunt (in Claude
+  Code, run /mcp and sign in to "workhunt") and give them the setup guide,
+  https://workhunt.ai/claude/. Do not try to do the task another way.
 
 - Never delete anything (there are no delete tools). Deleting and editing resume content
   happen in the WorkHunt app.
 
 - A WorkHunt tool error is written for the user (for example "Set a baseline resume first
   ...", a daily limit, "needs a WorkHunt pass"). Relay it in plain words, include any link
-  it contains, and do not retry the call.
+  it contains, and do not retry the call (a link WorkHunt could not read is the one
+  exception, step 4).
 
 - Never invent experience, and never claim the tailored resume contains something you
   have not seen in the tool output.

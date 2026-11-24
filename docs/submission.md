@@ -33,18 +33,18 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
   - "Prep me for my Northwind interview"
   - "Applied to Contoso for Software Engineer today, phone screen next Tuesday"
 - Icon: `plugins/workhunt/assets/icon.png` (512 x 512)
-- Documentation: https://app.workhunt.ai/connect
+- Documentation: https://workhunt.ai/claude/
 - Support: https://workhunt.ai/contact/ and support@workhunt.ai
 - Privacy policy: https://workhunt.ai/privacy/
 - Terms: https://workhunt.ai/terms/
 
 ## Data handling
 
-- What leaves Claude: the job posting text the user asks to tailor to, and the application details the user asks to log (company, role, status, dates, notes). Sent only to `https://api.workhunt.ai/mcp`, only when Claude calls a tool.
+- What leaves Claude: the job posting text or link the user asks to tailor to, and the application details the user asks to log (company, role, status, dates, notes). Sent only to `https://api.workhunt.ai/mcp`, only when Claude calls a tool.
 - What comes back: the user's own resumes, cover letters, interview prep and applications.
 - Authentication: OAuth on WorkHunt's sign-in page. The plugin holds no credentials and has no `userConfig`.
 - Local execution: none. No hooks, commands, agents or bundled binaries.
-- Other network access: none by the plugin. The tailor skill may ask Claude to fetch a job posting URL the user supplied, with Claude's own web fetch tool.
+- Other network access: none by the plugin or by Claude. A job posting link the user supplies goes to WorkHunt's `tailor_resume` tool, which reads the page on WorkHunt's servers.
 - Storage: Sydney, Australia (database, file storage and API hosting). WorkHunt stores what Claude's requests create (tailored resumes, cover letters, interview prep, applications) in the user's account.
 - AI processing on WorkHunt's side: tailoring, cover letters and interview prep are written by WorkHunt's model provider (through OpenRouter, currently Google), with data collection disabled.
 - Retention: data is kept while the account is open. Deleting the account from Settings takes effect immediately; only billing records and audit entries required by law are kept.
@@ -57,7 +57,7 @@ These statements were checked against https://workhunt.ai/privacy/ (last updated
 
 - Licence: MIT (`LICENSE`).
 - Destructive actions: none. No tool deletes anything; every tool declares `destructiveHint: false`.
-- Paid usage: tailoring spends one of the user's daily AI analyses, and interview prep needs a WorkHunt pass. The skills ask before tailoring unless the user asked for it directly.
+- Paid usage: tailoring spends one of the user's daily AI tailoring sessions, and interview prep needs a WorkHunt pass. The skills ask before tailoring unless the user asked for it directly.
 
 ## Reviewer test account
 

@@ -3,7 +3,7 @@
     {
       "name": "list_resumes",
       "title": "List resumes",
-      "description": "Lists the user\u0027s WorkHunt resumes, newest first. The baseline resume is the one tailoring starts from.",
+      "description": "Lists the user's WorkHunt resumes, newest first. The baseline resume is the one tailoring starts from.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -76,7 +76,7 @@
     {
       "name": "get_resume",
       "title": "Get a resume",
-      "description": "Gets one resume\u0027s full content. A tailored resume that is still being written has status \u0027generating\u0027; its preview updates by itself when it is ready, with no further call needed.",
+      "description": "Gets one resume's full content. A tailored resume that is still being written has status 'generating'; its preview updates by itself when it is ready, with no further call needed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -185,35 +185,170 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://workhunt/resume-v2.html"
+          "resourceUri": "ui://workhunt/resume-v3.html"
         },
-        "openai/outputTemplate": "ui://workhunt/resume-v2.html",
+        "openai/outputTemplate": "ui://workhunt/resume-v3.html",
         "openai/widgetAccessible": true
+      }
+    },
+    {
+      "name": "create_baseline_resume",
+      "title": "Save baseline resume",
+      "description": "Saves the user's resume to WorkHunt as their baseline - the resume tailoring starts from - so tailor_resume can run. Call it only when the user has no baseline resume and has pasted or typed their own resume in this chat; pass that text in full and unchanged. Never write, summarize, guess or embellish a resume yourself, and never pass a job posting. WorkHunt reads the text into its resume structure without adding anything. It only ever adds a resume: if the user already has a baseline it changes nothing and says so. Does not use a daily AI analysis. Returns the saved resume; ask the user to check it, then continue with tailor_resume.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resumeText": {
+            "description": "The user's resume as plain text, exactly as they provided it in this chat.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "resumeText"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "isBaseline": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": true,
+          "generationError": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "editUrl": {
+            "type": "string"
+          },
+          "template": {
+            "type": "integer"
+          },
+          "formattingOptions": {
+            "type": "object",
+            "properties": {
+              "fontFamily": {
+                "type": "string"
+              },
+              "fontSizePt": {
+                "type": "number"
+              },
+              "lineHeight": {
+                "type": "number"
+              },
+              "marginInches": {
+                "type": "number"
+              },
+              "accentColor": {
+                "type": "string"
+              },
+              "paperSize": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "Auto",
+                  "A4",
+                  "Letter",
+                  null
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "fontFamily",
+              "fontSizePt",
+              "lineHeight",
+              "marginInches",
+              "accentColor"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "isBaseline",
+          "updatedAt",
+          "content",
+          "generationError",
+          "editUrl",
+          "template",
+          "formattingOptions"
+        ]
+      },
+      "annotations": {
+        "title": "Save baseline resume",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/resume-v3.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/resume-v3.html",
+        "openai/toolInvocation/invoking": "Saving your resume…",
+        "openai/toolInvocation/invoked": "Baseline resume saved"
       }
     },
     {
       "name": "tailor_resume",
       "title": "Tailor resume to a job",
-      "description": "Creates a new resume tailored to a job posting, starting from the user\u0027s baseline resume. Pass the full job description text. Uses one of the user\u0027s daily AI analyses. Returns the tailored resume, or status \u0027generating\u0027 if it is still being written: the preview then fills in by itself when it is ready, with no further call needed. The returned sessionId is used by generate_cover_letter and generate_interview_prep.",
+      "description": "Creates a new resume tailored to a job posting, starting from the user's baseline resume. Pass the full job description text, or jobUrl when the user shares only a link: WorkHunt reads the page, and if the site blocks that (LinkedIn, SEEK and some others do) the error says to ask the user for the text. Uses one of the user's daily AI analyses. If the same posting was already tailored today, the existing resume is returned (`reused` true) and no analysis is spent; say it is the one from earlier, not a new version. Returns the tailored resume, or status 'generating' if it is still being written: the preview then fills in by itself when it is ready, with no further call needed. If the user has no baseline resume, ask them to paste their resume text (then call create_baseline_resume) or to use the link in the error. The returned sessionId is used by generate_cover_letter and generate_interview_prep. Also names the session after the job. It does not track the application; to track it, call list_applications first and update a matching entry (a saved one moves to tailored) or add_application with this sessionId. `match` is null while the comparison is still running: say the score is in WorkHunt, never invent one. `remainingToday` is how many tailorings are left today after this one (null = unknown); say so when it is 0 or 1. `plan` is free, pass or company (an employer seat). `match.baselineMatchScore` is how well the user's baseline resume (before tailoring) fits the job; never present it as the tailored resume's score.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "jobDescription": {
-            "description": "The full text of the job posting.",
-            "type": "string"
+            "description": "The full text of the job posting. Leave it out only when passing jobUrl.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           },
           "jobTitle": {
-            "description": "Optional short name for this job, e.g. \u0027Senior Engineer at Acme\u0027.",
+            "description": "Optional short name for this job, e.g. 'Senior Engineer at Acme'.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "company": {
+            "description": "The hiring company's name, only if the posting or the user states it.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "jobUrl": {
+            "description": "A link to the job posting, when the user shares a link instead of the text. It is also saved as the posting's link.",
             "type": [
               "string",
               "null"
             ],
             "default": null
           }
-        },
-        "required": [
-          "jobDescription"
-        ]
+        }
       },
       "outputSchema": {
         "type": "object",
@@ -311,6 +446,117 @@
           },
           "tailorUrl": {
             "type": "string"
+          },
+          "job": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "company": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "seniority": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "keywords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "title",
+              "company",
+              "location",
+              "seniority",
+              "keywords"
+            ],
+            "default": null
+          },
+          "match": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "baselineMatchScore": {
+                "type": "integer"
+              },
+              "tailoredMatchScore": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "applyVerdict": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "metRequirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "partialRequirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missingRequirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "baselineMatchScore",
+              "tailoredMatchScore",
+              "applyVerdict",
+              "metRequirements",
+              "partialRequirements",
+              "missingRequirements"
+            ],
+            "default": null
+          },
+          "remainingToday": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "default": null
+          },
+          "plan": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "reused": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
@@ -327,22 +573,133 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://workhunt/resume-v2.html"
+          "resourceUri": "ui://workhunt/resume-v3.html"
         },
-        "openai/outputTemplate": "ui://workhunt/resume-v2.html",
-        "openai/toolInvocation/invoking": "Tailoring your resume\u2026",
+        "openai/outputTemplate": "ui://workhunt/resume-v3.html",
+        "openai/toolInvocation/invoking": "Tailoring your resume…",
         "openai/toolInvocation/invoked": "Resume tailored"
+      }
+    },
+    {
+      "name": "list_tailoring_sessions",
+      "title": "List tailored jobs",
+      "description": "Lists the jobs the user has tailored a resume for, newest first, each with the sessionId that generate_cover_letter, get_cover_letter, generate_interview_prep and get_interview_prep take. Use it in a new chat to find an earlier job by company or role. Read-only and spends no AI analysis. Chats that never analyzed a job are not listed. If several jobs match, ask the user which one; if none match, say so rather than tailoring again.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "description": "Optional words from the company or job title, e.g. 'Airwallex'. Omit to list all.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "page": {
+            "type": "integer",
+            "default": 1
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sessionId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "company": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "tailoredResumeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid"
+                },
+                "hasCoverLetter": {
+                  "type": "boolean"
+                },
+                "hasInterviewPrep": {
+                  "type": "boolean"
+                },
+                "openUrl": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "sessionId",
+                "title",
+                "company",
+                "role",
+                "createdAt",
+                "updatedAt",
+                "tailoredResumeId",
+                "hasCoverLetter",
+                "hasInterviewPrep",
+                "openUrl"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sessions",
+          "page",
+          "totalCount",
+          "hasMore"
+        ]
+      },
+      "annotations": {
+        "title": "List tailored jobs",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
       }
     },
     {
       "name": "generate_cover_letter",
       "title": "Write a cover letter",
-      "description": "Writes a cover letter for a job already tailored with tailor_resume (pass its sessionId). Returns the letter, or status \u0027generating\u0027 - then call get_cover_letter. If the session already has a cover letter it is returned unchanged, never rewritten (the user can regenerate it in WorkHunt).",
+      "description": "Writes a cover letter for a job already tailored with tailor_resume (pass its sessionId; in a new chat, find it with list_tailoring_sessions). Returns the letter, or status 'generating' if it is still being written: an inline preview then fills in by itself; where there is no preview, call get_cover_letter once. If the session already has a cover letter it is returned unchanged, never rewritten (the user can regenerate it in WorkHunt).",
       "inputSchema": {
         "type": "object",
         "properties": {
           "sessionId": {
-            "description": "The sessionId returned by tailor_resume.",
+            "description": "The sessionId from tailor_resume or list_tailoring_sessions.",
             "type": "string",
             "format": "uuid"
           }
@@ -390,17 +747,25 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/cover-letter-v1.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/cover-letter-v1.html",
+        "openai/toolInvocation/invoking": "Writing your cover letter…",
+        "openai/toolInvocation/invoked": "Cover letter written"
       }
     },
     {
       "name": "get_cover_letter",
       "title": "Get a cover letter",
-      "description": "Gets the cover letter for a tailoring session, if one has been written.",
+      "description": "Gets the cover letter for a tailoring session, if one has been written. In a new chat, find the sessionId with list_tailoring_sessions.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "sessionId": {
-            "description": "The sessionId returned by tailor_resume.",
+            "description": "The sessionId from tailor_resume or list_tailoring_sessions.",
             "type": "string",
             "format": "uuid"
           }
@@ -448,17 +813,24 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/cover-letter-v1.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/cover-letter-v1.html",
+        "openai/widgetAccessible": true
       }
     },
     {
       "name": "generate_interview_prep",
       "title": "Generate interview prep",
-      "description": "Generates interview preparation for a job tailored with tailor_resume (needs a WorkHunt pass): likely interview questions, a company brief and recruiter-screen scripts by default. Only missing sections are generated; sections that already exist are returned unchanged, never replaced (the user can regenerate them in WorkHunt). If pending is non-empty, call again with sections set to pending to generate the rest.",
+      "description": "Generates interview preparation for a job tailored with tailor_resume (needs a WorkHunt pass; get_account_status says whether the user has one): likely interview questions, a company brief and recruiter-screen scripts by default. Only missing sections are generated; sections that already exist are returned as they are (the user can regenerate them in WorkHunt). If pending is non-empty, call again with sections set to pending to generate the rest. In a new chat, find the sessionId with list_tailoring_sessions.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "sessionId": {
-            "description": "The sessionId returned by tailor_resume.",
+            "description": "The sessionId from tailor_resume or list_tailoring_sessions.",
             "type": "string",
             "format": "uuid"
           },
@@ -523,18 +895,23 @@
         "readOnlyHint": false
       },
       "_meta": {
-        "openai/toolInvocation/invoking": "Preparing interview material\u2026"
+        "ui": {
+          "resourceUri": "ui://workhunt/interview-prep-v1.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/interview-prep-v1.html",
+        "openai/toolInvocation/invoking": "Preparing interview material…",
+        "openai/toolInvocation/invoked": "Interview prep ready"
       }
     },
     {
       "name": "get_interview_prep",
       "title": "Get interview prep",
-      "description": "Gets the interview preparation already generated for a tailoring session (needs a WorkHunt pass).",
+      "description": "Gets the interview preparation already generated for a tailoring session (needs a WorkHunt pass). In a new chat, find the sessionId with list_tailoring_sessions.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "sessionId": {
-            "description": "The sessionId returned by tailor_resume.",
+            "description": "The sessionId from tailor_resume or list_tailoring_sessions.",
             "type": "string",
             "format": "uuid"
           }
@@ -583,6 +960,12 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/interview-prep-v1.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/interview-prep-v1.html"
       }
     },
     {
@@ -668,6 +1051,56 @@
                 },
                 "trackerUrl": {
                   "type": "string"
+                },
+                "timelineNotes": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "note",
+                      "createdAt"
+                    ]
+                  },
+                  "default": null
+                },
+                "nextTime": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "time",
+                  "default": null
+                },
+                "nextStep": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "postingUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
                 }
               },
               "required": [
@@ -710,15 +1143,15 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://workhunt/applications-v2.html"
+          "resourceUri": "ui://workhunt/applications-v4.html"
         },
-        "openai/outputTemplate": "ui://workhunt/applications-v2.html"
+        "openai/outputTemplate": "ui://workhunt/applications-v4.html"
       }
     },
     {
       "name": "get_application",
       "title": "Get a job application",
-      "description": "Gets one tracked job application.",
+      "description": "Gets one tracked job application. Includes the notes added with add_application_note as timelineNotes (newest first, up to 20), separate from the free-form notes field.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -788,6 +1221,56 @@
           },
           "trackerUrl": {
             "type": "string"
+          },
+          "timelineNotes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "note",
+                "createdAt"
+              ]
+            },
+            "default": null
+          },
+          "nextTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "time",
+            "default": null
+          },
+          "nextStep": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "postingUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         },
         "required": [
@@ -809,12 +1292,18 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/applications-v4.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/applications-v4.html"
       }
     },
     {
       "name": "add_application",
       "title": "Track a job application",
-      "description": "Adds a job application to the user\u0027s WorkHunt tracker. Pass sessionId/resumeId from tailor_resume to link the tailored resume. A session already tracked returns its existing application unchanged.",
+      "description": "Adds a job application to the user's WorkHunt tracker. Pass sessionId/resumeId from tailor_resume to link the tailored resume, and postingUrl when the user shared the job's link. A session already tracked returns its existing application unchanged.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -849,6 +1338,14 @@
             "format": "date-time",
             "default": null
           },
+          "nextTime": {
+            "description": "Time of the next step on the user's own clock, 24-hour HH:mm (e.g. 14:30). Optional; needs nextDate in the same call.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
           "notes": {
             "description": "Free-form notes. Optional.",
             "type": [
@@ -873,6 +1370,14 @@
               "null"
             ],
             "format": "uuid",
+            "default": null
+          },
+          "postingUrl": {
+            "description": "The job posting's link, http or https. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
@@ -937,6 +1442,56 @@
           },
           "trackerUrl": {
             "type": "string"
+          },
+          "timelineNotes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "note",
+                "createdAt"
+              ]
+            },
+            "default": null
+          },
+          "nextTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "time",
+            "default": null
+          },
+          "nextStep": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "postingUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         },
         "required": [
@@ -958,6 +1513,12 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/applications-v4.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/applications-v4.html"
       }
     },
     {
@@ -983,6 +1544,14 @@
               "null"
             ],
             "format": "date-time",
+            "default": null
+          },
+          "nextTime": {
+            "description": "Time of the next step on the user's own clock, 24-hour HH:mm (e.g. 14:30). Optional; needs nextDate in the same call.",
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
@@ -1047,6 +1616,56 @@
           },
           "trackerUrl": {
             "type": "string"
+          },
+          "timelineNotes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "note",
+                "createdAt"
+              ]
+            },
+            "default": null
+          },
+          "nextTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "time",
+            "default": null
+          },
+          "nextStep": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "postingUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         },
         "required": [
@@ -1069,12 +1688,18 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://workhunt/applications-v4.html"
+        },
+        "openai/outputTemplate": "ui://workhunt/applications-v4.html"
       }
     },
     {
       "name": "add_application_note",
       "title": "Add a note to an application",
-      "description": "Adds a note to a tracked application\u0027s timeline, e.g. who the user spoke to or what was agreed. Existing notes are kept.",
+      "description": "Adds a note to a tracked application's timeline, e.g. who the user spoke to or what was agreed. Existing notes are kept. get_application returns them in timelineNotes.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1128,6 +1753,83 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": false
+      }
+    },
+    {
+      "name": "get_account_status",
+      "title": "Check plan and daily limit",
+      "description": "Gets the user's WorkHunt plan and today's tailoring allowance: tailoringsLeftToday of dailyLimit, and when the count resets (resetsAt, midnight Sydney time). plan is 'free', 'pass' or 'company' (an employer seat). Read-only and spends no AI analysis. Call it when the user asks about limits, plans or price, and before tailoring several jobs. passesFrom is the lowest current pass price; null means unknown, so never guess a price. passesOnSale is null when unknown. passEndsAt is null on the free plan or a company seat. Mention a pass only when the user is at or near a limit or asks; share upgradeUrl as given.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string"
+          },
+          "passEndsAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "tailoringsLeftToday": {
+            "type": "integer"
+          },
+          "dailyLimit": {
+            "type": "integer"
+          },
+          "resetsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canTailor": {
+            "type": "boolean"
+          },
+          "hasBaselineResume": {
+            "type": "boolean"
+          },
+          "interviewPrepIncluded": {
+            "type": "boolean"
+          },
+          "upgradeUrl": {
+            "type": "string"
+          },
+          "passesFrom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "passesOnSale": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "plan",
+          "passEndsAt",
+          "tailoringsLeftToday",
+          "dailyLimit",
+          "resetsAt",
+          "canTailor",
+          "hasBaselineResume",
+          "interviewPrepIncluded",
+          "upgradeUrl",
+          "passesFrom",
+          "passesOnSale"
+        ]
+      },
+      "annotations": {
+        "title": "Check plan and daily limit",
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
       }
     }
   ]

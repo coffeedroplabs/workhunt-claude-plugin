@@ -20,7 +20,7 @@ Turn a plain-language update into the right WorkHunt tracker write.
 
 ## Rules
 
-- Tools are named by their bare names (list_applications, add_application, ...). Depending on the client they carry a prefix such as mcp__plugin_workhunt_workhunt__ or a connector prefix; any WorkHunt tool with the matching bare name is the right one. If no WorkHunt tools are available at all, tell the user to connect WorkHunt: run /mcp in Claude Code and sign in to "workhunt", or in claude.ai enable the WorkHunt connector under Settings > Connectors. Do not try to do the task another way.
+- Tools are named by their bare names (list_applications, add_application, ...). Depending on the client they carry a prefix such as mcp__plugin_workhunt_workhunt__ or a connector prefix; any WorkHunt tool with the matching bare name is the right one. If no WorkHunt tools are available at all, tell the user to connect WorkHunt (in Claude Code, run /mcp and sign in to "workhunt") and give them the setup guide, https://workhunt.ai/claude/. Do not try to do the task another way.
 - Never delete anything (there are no delete tools). Deleting and editing resume content happen in the WorkHunt app.
 - A WorkHunt tool error is written for the user (e.g. "Set a baseline resume first ...", a daily limit, "needs a WorkHunt pass"). Relay it in plain words, include any link it contains, and do not retry the call.
 - End with the WorkHunt link the last relevant tool returned (tailorUrl, editUrl, openUrl or trackerUrl) so the user can review or continue in WorkHunt.
