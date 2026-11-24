@@ -1,15 +1,15 @@
 {
   "name": "workhunt",
   "displayName": "WorkHunt",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Tailor your resume to any job posting, write a matching cover letter and interview prep, and track every application through your pipeline, without leaving Claude.",
   "author": {
     "name": "WorkHunt",
     "email": "support@workhunt.ai",
     "url": "https://workhunt.ai"
   },
-  "homepage": "https://app.workhunt.ai/connect",
-  "documentationUrl": "https://app.workhunt.ai/connect",
+  "homepage": "https://workhunt.ai/claude/",
+  "documentationUrl": "https://workhunt.ai/claude/",
   "repository": "https://github.com/coffeedroplabs/workhunt-claude-plugin",
   "license": "MIT",
   "keywords": ["resume", "job search", "cover letter", "interview prep", "job applications", "career"],
