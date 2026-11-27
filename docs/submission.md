@@ -46,7 +46,7 @@ Working notes for submitting at https://claude.ai/directory/manage (Submit new >
 - Local execution: none. No hooks, commands, agents or bundled binaries.
 - Other network access: none by the plugin or by Claude. A job posting link the user supplies goes to WorkHunt's `tailor_resume` tool, which reads the page on WorkHunt's servers.
 - Storage: Sydney, Australia (database, file storage and API hosting). WorkHunt stores what Claude's requests create (tailored resumes, cover letters, interview prep, applications) in the user's account.
-- AI processing on WorkHunt's side: tailoring, cover letters and interview prep are written by WorkHunt's model provider (through OpenRouter, currently Google), with data collection disabled.
+- AI processing on WorkHunt's side: tailored resumes are written by Anthropic (Claude), which deletes the content within 30 days and does not train on it; cover letters, interview prep and job analysis go through OpenRouter (currently Google), with data collection disabled, as does the tailored resume when Claude is unavailable.
 - Retention: data is kept while the account is open. Deleting the account from Settings takes effect immediately; only billing records and audit entries required by law are kept.
 - Connection: access tokens last an hour and renew for up to 30 days of inactivity, at most 90 days after approval. Users disconnect from Claude's connector settings.
 - Model training and sale: resume and job-search content is not used to train AI models, and personal information is not sold.
